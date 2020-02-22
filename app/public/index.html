@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Post overview</title>
+    <style type="text/css">
+        section {
+            border-bottom: 1px solid grey;
+            padding-bottom: 10px;
+        }
+
+        section p:first-of-type>strong {
+            color: rgb(2.8%, 11.1%, 47.6%);
+        }
+
+        section p:nth-of-type(2)>strong {
+            color: rgb(29.1%, 30.8%, 38.2%);
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Posts and their author</h2>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const renderPost = (body, post) => {
+                const section = document.createElement('section');
+                const domString = `
+          <p>
+            <strong>Post: </strong>${post.title}
+          </p>
+          <p>
+            <strong>Author: </strong>${post.author.firstName}
+          </p>
+        `;
+                section.innerHTML = domString;
+                body.appendChild(section);
+            };
+
+            const promisePosts = fetch("/posts")
+                .then((response) => response.json());
+
+            const promiseAuthors = promisePosts
+                .then((posts) => {
+                    return Promise.all(
+                        posts.map(
+                            (post) => fetch(`/author/${post.authorId}`)
+                                .then((r) => r.json())
+                        )
+                    );
+                });
+
+            const body = document.body;
+            Promise.all([promisePosts, promiseAuthors])
+                .then(([posts, authors]) => {
+                    authors.forEach((author, index) => {
+                        if (posts[index]) {
+                            const aggregatedPost = { ...posts[index], author };
+                            renderPost(body, aggregatedPost);
+                        }
+                    })
+                })
+                .catch((e) => console.error(e));
+
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+https://medium.com/valtech-ch/setup-a-rest-api-with-sequelize-and-express-js-fae06d08c0a7
+
+Removed the "npm run init-db" command from the start command. the database is already created by the docker
+
+Added endpoint "authors" in the API to return all the authors.
